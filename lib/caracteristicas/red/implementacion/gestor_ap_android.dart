@@ -125,4 +125,28 @@ class GestorApAndroid implements GestorAp {
       return null;
     }
   }
+
+  @override
+  Future<List<String>> escanearRedesDisponibles() async {
+    if (!esPlataformaSoportada) {
+      return [];
+    }
+
+    try {
+      // ignore: deprecated_member_use
+      final redes = await WiFiForIoTPlugin.loadWifiList();
+      final conjunto = <String>{};
+      for (final red in redes) {
+        final nombre = red.ssid;
+        if (nombre != null &&
+            nombre.trim().isNotEmpty &&
+            nombre != '<unknown ssid>') {
+          conjunto.add(nombre.trim());
+        }
+      }
+      return conjunto.toList();
+    } catch (_) {
+      return [];
+    }
+  }
 }

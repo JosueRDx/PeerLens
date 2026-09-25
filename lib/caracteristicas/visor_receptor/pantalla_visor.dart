@@ -142,7 +142,14 @@ class _PantallaVisorState extends State<PantallaVisor> {
     try {
       var hostLimpio = direccionHost
           .replaceAll('http://', '')
-          .replaceAll('https://', '');
+          .replaceAll('https://', '')
+          .replaceAll('ws://', '')
+          .replaceAll('wss://', '');
+
+      if (hostLimpio.contains('/')) {
+        hostLimpio = hostLimpio.split('/')[0];
+      }
+
       var puertoFinal = puerto;
 
       if (hostLimpio.contains(':')) {

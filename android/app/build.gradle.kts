@@ -24,7 +24,7 @@ android {
         applicationId = "com.peerlens.peerlens"
         // You can update the following values to match your application needs.
         // compatibilidad minima requerida por flutter_webrtc y mobile_scanner
-        minSdk = 21
+        minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

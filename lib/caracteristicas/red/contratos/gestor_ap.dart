@@ -11,4 +11,5 @@ abstract class GestorAp {
   Future<bool> desconectarDeRedLan();
   Future<String?> obtenerDireccionIpLocal();
   Future<String?> obtenerSsidActual();
+  Future<List<String>> escanearRedesDisponibles();
 }

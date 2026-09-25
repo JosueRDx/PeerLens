@@ -1,64 +1,66 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '../../compartido/widgets/badge_estado.dart';
 import '../../compartido/widgets/contenedor_superficie.dart';
 import '../../configuracion/tema/colores.dart';
-import '../../nucleo/almacenamiento/servicio_almacenamiento_local.dart';
-import '../../nucleo/modelos/credencial_red.dart';
-import '../red/implementacion/gestor_ap_android.dart';
-import '../transmision/implementacion/motor_webrtc_emisor.dart';
+import '../../nucleo/modelos/estado_nodo.dart';
+import '../../nucleo/orquestacion/orquestador_p2p.dart';
 import 'widgets/botonera_control.dart';
 import 'widgets/hoja_configuracion_wifi.dart';
 import 'widgets/visor_qr_ap.dart';
 
 // dashboard principal para el control y streaming del nodo camara emisora
 class PantallaCamara extends StatefulWidget {
-  const PantallaCamara({super.key});
+  final OrquestadorP2p? orquestadorPruebas;
+
+  const PantallaCamara({super.key, this.orquestadorPruebas});
 
   @override
   State<PantallaCamara> createState() => _PantallaCamaraState();
 }
 
 class _PantallaCamaraState extends State<PantallaCamara> {
+  late final OrquestadorP2p _orquestador;
+  StreamSubscription? _suscripcionEstado;
+
   bool _modoAhorroOled = false;
-  bool _mostrarQr = false;
-  String _ssidAp = 'PeerLens_AP_8080';
-  String _claveAp = '12345678';
+  bool _mostrarQr = true;
+  bool _renderizadorInicializado = false;
+
   final int _clientesConectados = 1;
   final String _resolucionTexto = '1280x720';
   final int _cuadrosPorSegundo = 30;
 
-  late final MotorWebRtcEmisor _motorEmisor;
-  bool _renderizadorInicializado = false;
-
   @override
   void initState() {
     super.initState();
-    _motorEmisor = MotorWebRtcEmisor();
+    _orquestador = widget.orquestadorPruebas ?? OrquestadorP2p();
     _iniciarComponentes();
   }
 
   // inicializa el motor de captura de video local y componentes de red
   Future<void> _iniciarComponentes() async {
-    _ssidAp = GestorApAndroid.generarSsidAleatorio();
-    _claveAp = GestorApAndroid.generarClaveAleatoria();
+    _suscripcionEstado = _orquestador.flujoEstado.listen((estado) {
+      if (mounted) {
+        setState(() {});
+      }
+    });
 
     try {
-      await _motorEmisor.inicializarRenderizador();
-      await _motorEmisor.iniciarCapturaCamara();
+      await _orquestador.iniciar();
       if (mounted) {
         setState(() {
           _renderizadorInicializado = true;
         });
       }
-    } catch (_) {
-      // captura protegida para entornos de prueba o simulador
-    }
+    } catch (_) {}
   }
 
   @override
   void dispose() {
-    _motorEmisor.liberarRecursos();
+    _suscripcionEstado?.cancel();
+    _orquestador.liberarRecursos();
     super.dispose();
   }
 
@@ -74,19 +76,11 @@ class _PantallaCamaraState extends State<PantallaCamara> {
       context: context,
       alGuardar: (ssid, clave) async {
         try {
-          final servicio = await ServicioAlmacenamientoLocal.crear();
-          await servicio.guardarCredencialRed(
-            CredencialRed(
-              nombreRed: ssid,
-              claveRed: clave,
-              fechaGuardado: DateTime.now(),
-            ),
-          );
-
+          await _orquestador.aprovisionarNuevaRed(ssid, clave);
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Credenciales guardadas para red $ssid'),
+                content: Text('Conectando a red Wi-Fi $ssid'),
                 backgroundColor: ColoresApp.acentoActivo,
               ),
             );
@@ -96,19 +90,24 @@ class _PantallaCamaraState extends State<PantallaCamara> {
     );
   }
 
-  void _reiniciarServidor() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Reiniciando servidor de señalización local'),
-        backgroundColor: ColoresApp.acentoRed,
-      ),
-    );
+  Future<void> _reiniciarServidor() async {
+    try {
+      await _orquestador.servidorRed.detener();
+      await _orquestador.servidorRed.iniciar(puerto: 8080);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Servidor de señalización reiniciado en puerto 8080'),
+            backgroundColor: ColoresApp.acentoRed,
+          ),
+        );
+      }
+    } catch (_) {}
   }
 
   Future<void> _resetearRed() async {
     try {
-      final servicio = await ServicioAlmacenamientoLocal.crear();
-      await servicio.eliminarCredencialRed();
+      await _orquestador.olvidarRedYRetornarAp();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -118,6 +117,33 @@ class _PantallaCamaraState extends State<PantallaCamara> {
         );
       }
     } catch (_) {}
+  }
+
+  TipoEstadoBadge _obtenerTipoBadge() {
+    switch (_orquestador.estadoActual.estado) {
+      case TipoEstadoNodo.modoAp:
+        return TipoEstadoBadge.red;
+      case TipoEstadoNodo.conectandoLan:
+        return TipoEstadoBadge.alerta;
+      case TipoEstadoNodo.enLineaLan:
+        return TipoEstadoBadge.activo;
+      case TipoEstadoNodo.error:
+        return TipoEstadoBadge.error;
+    }
+  }
+
+  String _obtenerEtiquetaBadge() {
+    switch (_orquestador.estadoActual.estado) {
+      case TipoEstadoNodo.modoAp:
+        return 'Modo AP';
+      case TipoEstadoNodo.conectandoLan:
+        return 'Conectando';
+      case TipoEstadoNodo.enLineaLan:
+        final ip = _orquestador.estadoActual.direccionIp;
+        return ip != null ? 'LAN $ip' : 'En Línea LAN';
+      case TipoEstadoNodo.error:
+        return 'Error';
+    }
   }
 
   @override
@@ -143,7 +169,7 @@ class _PantallaCamaraState extends State<PantallaCamara> {
                 ),
                 SizedBox(height: 6),
                 Text(
-                  'Toca la pantalla para restablecer la vista',
+                  'Toca la pantalla para restaurar la vista',
                   style: TextStyle(color: Colors.white24, fontSize: 12),
                 ),
               ],
@@ -177,9 +203,12 @@ class _PantallaCamaraState extends State<PantallaCamara> {
             tooltip: 'Modo Ahorro OLED',
             onPressed: _alternarAhorroOled,
           ),
-          const Padding(
-            padding: EdgeInsets.only(right: 12, left: 4),
-            child: BadgeEstado(etiqueta: 'Modo AP', tipo: TipoEstadoBadge.red),
+          Padding(
+            padding: const EdgeInsets.only(right: 12, left: 4),
+            child: BadgeEstado(
+              etiqueta: _obtenerEtiquetaBadge(),
+              tipo: _obtenerTipoBadge(),
+            ),
           ),
         ],
       ),
@@ -190,7 +219,11 @@ class _PantallaCamaraState extends State<PantallaCamara> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               if (_mostrarQr) ...[
-                VisorQrAp(ssid: _ssidAp, clave: _claveAp),
+                VisorQrAp(
+                  ssid: _orquestador.ssidAp,
+                  clave: _orquestador.claveAp,
+                  urlServidor: _orquestador.urlServidor,
+                ),
                 const SizedBox(height: 16),
               ],
               // contenedor de previsualizacion de transmision
@@ -204,7 +237,7 @@ class _PantallaCamaraState extends State<PantallaCamara> {
                     children: [
                       if (_renderizadorInicializado)
                         RTCVideoView(
-                          _motorEmisor.renderizador,
+                          _orquestador.motorEmisor.renderizador,
                           mirror: false,
                           objectFit:
                               RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
@@ -220,9 +253,10 @@ class _PantallaCamaraState extends State<PantallaCamara> {
                             ),
                             SizedBox(height: 8),
                             Text(
-                              'Sensor de Cámara Activo',
+                              'Iniciando cámara nativa...',
                               style: TextStyle(
                                 color: ColoresApp.textoSecundario,
+                                fontSize: 13,
                               ),
                             ),
                           ],
@@ -236,24 +270,24 @@ class _PantallaCamaraState extends State<PantallaCamara> {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.6),
+                            color: Colors.black54,
                             borderRadius: BorderRadius.circular(6),
                           ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
+                          child: Row(
+                            children: const [
                               Icon(
-                                Icons.fiber_manual_record,
+                                Icons.circle,
                                 color: ColoresApp.acentoActivo,
-                                size: 10,
+                                size: 8,
                               ),
-                              SizedBox(width: 4),
+                              SizedBox(width: 6),
                               Text(
-                                'EN VIVO',
+                                'TRANSMITIENDO EN VIVO',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.5,
                                 ),
                               ),
                             ],
@@ -265,7 +299,7 @@ class _PantallaCamaraState extends State<PantallaCamara> {
                 ),
               ),
               const SizedBox(height: 16),
-              // hud de metricas tecnicas
+              // hud de metricas tecnicas en tiempo real
               ContenedorSuperficie(
                 relleno: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -274,23 +308,30 @@ class _PantallaCamaraState extends State<PantallaCamara> {
                 hijo: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _construirElementoHud(
-                      Icons.aspect_ratio_rounded,
-                      'Resolución',
-                      _resolucionTexto,
-                      ColoresApp.acentoRed,
+                    _construirElementoMetrica(
+                      icono: Icons.hd_outlined,
+                      etiqueta: 'Resolución',
+                      valor: _resolucionTexto,
                     ),
-                    _construirElementoHud(
-                      Icons.speed_rounded,
-                      'Velocidad',
-                      '$_cuadrosPorSegundo FPS',
-                      ColoresApp.acentoActivo,
+                    Container(
+                      height: 24,
+                      width: 1,
+                      color: ColoresApp.bordeSuperficie,
                     ),
-                    _construirElementoHud(
-                      Icons.people_alt_rounded,
-                      'Receptores',
-                      '$_clientesConectados Activo',
-                      ColoresApp.acentoAdvertencia,
+                    _construirElementoMetrica(
+                      icono: Icons.speed,
+                      etiqueta: 'Velocidad',
+                      valor: '$_cuadrosPorSegundo FPS',
+                    ),
+                    Container(
+                      height: 24,
+                      width: 1,
+                      color: ColoresApp.bordeSuperficie,
+                    ),
+                    _construirElementoMetrica(
+                      icono: Icons.people_alt_rounded,
+                      etiqueta: 'Receptores',
+                      valor: '$_clientesConectados',
                     ),
                   ],
                 ),
@@ -308,31 +349,35 @@ class _PantallaCamaraState extends State<PantallaCamara> {
     );
   }
 
-  Widget _construirElementoHud(
-    IconData icono,
-    String titulo,
-    String valor,
-    Color colorAcento,
-  ) {
+  Widget _construirElementoMetrica({
+    required IconData icono,
+    required String etiqueta,
+    required String valor,
+  }) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icono, color: colorAcento, size: 20),
-        const SizedBox(height: 4),
-        Text(
-          titulo,
-          style: const TextStyle(
-            color: ColoresApp.textoSecundario,
-            fontSize: 11,
-          ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icono, size: 14, color: ColoresApp.acentoRed),
+            const SizedBox(width: 4),
+            Text(
+              valor,
+              style: const TextStyle(
+                color: ColoresApp.textoPrimario,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 2),
         Text(
-          valor,
+          etiqueta,
           style: const TextStyle(
-            color: ColoresApp.textoPrimario,
-            fontSize: 13,
-            fontWeight: FontWeight.bold,
+            color: ColoresApp.textoSecundario,
+            fontSize: 11,
           ),
         ),
       ],

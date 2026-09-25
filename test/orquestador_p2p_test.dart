@@ -60,6 +60,12 @@ class GestorApFalso implements GestorAp {
 
   @override
   Future<String?> obtenerSsidActual() async => conectadoLan ? 'MiWifi' : null;
+
+  @override
+  Future<List<String>> escanearRedesDisponibles() async => [
+    'MiWifi',
+    'RedVecino',
+  ];
 }
 
 class ServidorRedFalso implements ServidorRed {
