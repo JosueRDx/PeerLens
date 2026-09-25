@@ -1,0 +1,49 @@
+name: peerlens
+description: Solucion multiplataforma para transmision de video en tiempo real punto a punto
+publish_to: 'none'
+
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.11.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # motor de captura y streaming peer to peer
+  flutter_webrtc: ^1.6.2+hotfix.3
+
+  # servidor http y senalizacion web socket para sesion local
+  shelf: ^1.4.2
+
+  # enrutador para endpoints del servidor de senalizacion
+  shelf_router: ^1.1.4
+
+  # canal de comunicacion bidireccional en tiempo real
+  shelf_web_socket: ^3.0.0
+
+  # descubrimiento de servicios mdns en red local
+  nsd: ^5.0.1
+
+  # gestion de conexiones wifi y punto de acceso en android
+  wifi_iot: ^0.3.19+3
+
+  # generacion de codigos qr para emparejamiento rapido
+  qr_flutter: ^4.1.0
+
+  # captura y lectura de codigos qr mediante camara
+  mobile_scanner: ^7.4.2
+
+  # persistencia local para parametros y configuraciones
+  shared_preferences: ^2.5.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true

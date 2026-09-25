@@ -1,0 +1,58 @@
+# artefactos de compilacion y dependencias flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+coverage/
+
+# artefactos especificos de la plataforma android
+android/.gradle/
+android/captures/
+android/gradle/wrapper/gradle-wrapper.jar
+android/local.properties
+android/app/debug/
+android/app/profile/
+android/app/release/
+**/android/**/build/
+
+# artefactos especificos de la plataforma web
+web/build/
+**/web/**/build/
+
+# claves de firma y credenciales sensibles
+*.jks
+*.keystore
+*.key
+*.pem
+*.p12
+*.pfx
+**/key.properties
+*.env
+.env*
+
+# ofuscacion y tablas de simbolos
+app.*.symbols
+app.*.map.json
+
+# herramientas y configuraciones de entorno de desarrollo
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+*.swp
+*.swo
+*~
+.history/
+
+# archivos generados y temporales del sistema operativo
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
