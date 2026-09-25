@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../compartido/widgets/badge_estado.dart';
 import '../../configuracion/tema/colores.dart';
 import '../../nucleo/almacenamiento/servicio_almacenamiento_local.dart';
-import '../transmision/paginas/pagina_emisor_camara.dart';
+import '../camara_emisor/pantalla_camara.dart';
 import '../transmision/paginas/pagina_receptor_visor.dart';
 import 'widgets/tarjeta_rol.dart';
 
@@ -102,7 +102,7 @@ class _PantallaSeleccionRolState extends State<PantallaSeleccionRol> {
                 icono: Icons.videocam_rounded,
                 colorAcento: ColoresApp.acentoRed,
                 alSeleccionar: () =>
-                    _seleccionarRol('camara', const PaginaEmisorCamara()),
+                    _seleccionarRol('camara', const PantallaCamara()),
               ),
               const SizedBox(height: 16),
               TarjetaRol(

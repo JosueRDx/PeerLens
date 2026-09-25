@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'caracteristicas/camara_emisor/pantalla_camara.dart';
 import 'caracteristicas/seleccion_rol/pantalla_seleccion_rol.dart';
-import 'caracteristicas/transmision/paginas/pagina_emisor_camara.dart';
 import 'caracteristicas/transmision/paginas/pagina_receptor_visor.dart';
 import 'configuracion/tema/tema_app.dart';
 
@@ -16,7 +16,7 @@ class AplicacionPeerLens extends StatelessWidget {
       theme: TemaApp.temaOscuro,
       home: const PantallaSeleccionRol(),
       routes: {
-        '/camara': (context) => const PaginaEmisorCamara(),
+        '/camara': (context) => const PantallaCamara(),
         '/visor': (context) => const PaginaReceptorVisor(),
       },
     );
