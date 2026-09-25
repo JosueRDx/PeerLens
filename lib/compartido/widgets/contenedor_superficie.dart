@@ -29,10 +29,7 @@ class ContenedorSuperficie extends StatelessWidget {
     final decoracion = BoxDecoration(
       color: ColoresApp.fondoSuperficie,
       borderRadius: radioEfectivo,
-      border: Border.all(
-        color: ColoresApp.bordeSuperficie,
-        width: 1,
-      ),
+      border: Border.all(color: ColoresApp.bordeSuperficie, width: 1),
     );
 
     if (alPresionar != null) {
@@ -45,11 +42,7 @@ class ContenedorSuperficie extends StatelessWidget {
           child: InkWell(
             borderRadius: radioEfectivo,
             onTap: alPresionar,
-            child: Ink(
-              decoration: decoracion,
-              padding: relleno,
-              child: hijo,
-            ),
+            child: Ink(decoration: decoracion, padding: relleno, child: hijo),
           ),
         ),
       );

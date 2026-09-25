@@ -33,10 +33,7 @@ class TemaApp {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(
-            color: ColoresApp.bordeSuperficie,
-            width: 1,
-          ),
+          side: const BorderSide(color: ColoresApp.bordeSuperficie, width: 1),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -45,28 +42,17 @@ class TemaApp {
           foregroundColor: ColoresApp.fondoPrimario,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          textStyle: const TextStyle(
-            fontWeight: FontWeight.w600,
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          textStyle: const TextStyle(fontWeight: FontWeight.w600),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: ColoresApp.textoPrimario,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          side: const BorderSide(
-            color: ColoresApp.bordeSuperficie,
-            width: 1,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          textStyle: const TextStyle(
-            fontWeight: FontWeight.w600,
-          ),
+          side: const BorderSide(color: ColoresApp.bordeSuperficie, width: 1),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          textStyle: const TextStyle(fontWeight: FontWeight.w600),
         ),
       ),
       textTheme: const TextTheme(
@@ -82,20 +68,14 @@ class TemaApp {
           color: ColoresApp.textoPrimario,
           fontWeight: FontWeight.w600,
         ),
-        bodyLarge: TextStyle(
-          color: ColoresApp.textoPrimario,
-        ),
-        bodyMedium: TextStyle(
-          color: ColoresApp.textoSecundario,
-        ),
+        bodyLarge: TextStyle(color: ColoresApp.textoPrimario),
+        bodyMedium: TextStyle(color: ColoresApp.textoSecundario),
         labelLarge: TextStyle(
           color: ColoresApp.textoPrimario,
           fontWeight: FontWeight.w500,
         ),
       ),
-      extensions: const [
-        ExtensionColoresApp.predeterminado(),
-      ],
+      extensions: const [ExtensionColoresApp.predeterminado()],
     );
   }
 }

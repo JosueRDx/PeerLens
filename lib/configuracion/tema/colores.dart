@@ -35,14 +35,14 @@ class ExtensionColoresApp extends ThemeExtension<ExtensionColoresApp> {
   });
 
   const ExtensionColoresApp.predeterminado()
-      : this._(
-          bordeSuperficie: ColoresApp.bordeSuperficie,
-          negroOled: ColoresApp.negroOled,
-          acentoActivo: ColoresApp.acentoActivo,
-          acentoRed: ColoresApp.acentoRed,
-          acentoAdvertencia: ColoresApp.acentoAdvertencia,
-          acentoPeligro: ColoresApp.acentoPeligro,
-        );
+    : this._(
+        bordeSuperficie: ColoresApp.bordeSuperficie,
+        negroOled: ColoresApp.negroOled,
+        acentoActivo: ColoresApp.acentoActivo,
+        acentoRed: ColoresApp.acentoRed,
+        acentoAdvertencia: ColoresApp.acentoAdvertencia,
+        acentoPeligro: ColoresApp.acentoPeligro,
+      );
 
   @override
   ExtensionColoresApp copyWith({

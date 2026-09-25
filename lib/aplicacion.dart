@@ -11,11 +11,7 @@ class AplicacionPeerLens extends StatelessWidget {
       title: 'PeerLens',
       debugShowCheckedModeBanner: false,
       theme: TemaApp.temaOscuro,
-      home: const Scaffold(
-        body: Center(
-          child: Text('PeerLens'),
-        ),
-      ),
+      home: const Scaffold(body: Center(child: Text('PeerLens'))),
     );
   }
 }
