@@ -3,7 +3,7 @@ import '../../compartido/widgets/badge_estado.dart';
 import '../../configuracion/tema/colores.dart';
 import '../../nucleo/almacenamiento/servicio_almacenamiento_local.dart';
 import '../camara_emisor/pantalla_camara.dart';
-import '../transmision/paginas/pagina_receptor_visor.dart';
+import '../visor_receptor/pantalla_visor.dart';
 import 'widgets/tarjeta_rol.dart';
 
 // pantalla principal para la eleccion interactiva del rol de dispositivo
@@ -112,7 +112,7 @@ class _PantallaSeleccionRolState extends State<PantallaSeleccionRol> {
                 icono: Icons.monitor_rounded,
                 colorAcento: ColoresApp.acentoActivo,
                 alSeleccionar: () =>
-                    _seleccionarRol('visor', const PaginaReceptorVisor()),
+                    _seleccionarRol('visor', const PantallaVisor()),
               ),
               const Spacer(),
               Theme(

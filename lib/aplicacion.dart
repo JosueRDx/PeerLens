@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'caracteristicas/camara_emisor/pantalla_camara.dart';
 import 'caracteristicas/seleccion_rol/pantalla_seleccion_rol.dart';
-import 'caracteristicas/transmision/paginas/pagina_receptor_visor.dart';
+import 'caracteristicas/visor_receptor/pantalla_visor.dart';
 import 'configuracion/tema/tema_app.dart';
 
 // widget raiz de la aplicacion peerlens
@@ -17,7 +17,7 @@ class AplicacionPeerLens extends StatelessWidget {
       home: const PantallaSeleccionRol(),
       routes: {
         '/camara': (context) => const PantallaCamara(),
-        '/visor': (context) => const PaginaReceptorVisor(),
+        '/visor': (context) => const PantallaVisor(),
       },
     );
   }
