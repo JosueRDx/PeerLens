@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'nucleo/tema/tema_aplicacion.dart';
+import 'configuracion/tema/tema_app.dart';
 
 // widget raiz de la aplicacion peerlens
 class AplicacionPeerLens extends StatelessWidget {
@@ -10,8 +10,12 @@ class AplicacionPeerLens extends StatelessWidget {
     return MaterialApp(
       title: 'PeerLens',
       debugShowCheckedModeBanner: false,
-      theme: TemaAplicacion.temaOscuro,
-      home: const Scaffold(body: Center(child: Text('PeerLens'))),
+      theme: TemaApp.temaOscuro,
+      home: const Scaffold(
+        body: Center(
+          child: Text('PeerLens'),
+        ),
+      ),
     );
   }
 }
